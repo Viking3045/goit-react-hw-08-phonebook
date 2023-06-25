@@ -1,13 +1,20 @@
-import { useAuth } from 'hooks';
-import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Navigate, Outlet } from 'react-router-dom';
+import LinearIndeterminate from 'services/LinearIndeterminate';
 
-/**
- * - If the route is restricted and the user is logged in, render a <Navigate> to redirectTo
- * - Otherwise render the component
- */
+import { getAuth } from 'redux/auth/auth-selectors';
 
-export const RestrictedRoute = ({ component: Component, redirectTo = '/' }) => {
-  const { isLoggedIn } = useAuth();
+const RestrictedRoute = () => {
+  const { isLogin, token } = useSelector(getAuth);
 
-  return isLoggedIn ? <Navigate to={redirectTo} /> : Component;
+  if (!isLogin && token) {
+    return <LinearIndeterminate />;
+  }
+
+  if (isLogin) {
+    return <Navigate to="/contacts" />;
+  }
+  return <Outlet />;
 };
+
+export default RestrictedRoute;

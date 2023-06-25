@@ -1,14 +1,20 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from 'hooks';
+import { useSelector } from 'react-redux';
+import { Navigate, Outlet } from 'react-router-dom';
+import LinearIndeterminate from 'services/LinearIndeterminate';
 
-/**
- * - If the route is private and the user is logged in, render the component
- * - Otherwise render <Navigate> to redirectTo
- */
+import { getAuth } from 'redux/auth/auth-selectors';
 
-export const PrivateRoute = ({ component: Component, redirectTo = '/' }) => {
-  const { isLoggedIn, isRefreshing } = useAuth();
-  const shouldRedirect = !isLoggedIn && !isRefreshing;
+const PrivateRoute = () => {
+  const { isLogin, token } = useSelector(getAuth);
 
-  return shouldRedirect ? <Navigate to={redirectTo} /> : Component;
+  if (!isLogin && token) {
+    return <LinearIndeterminate />;
+  }
+
+  if (!isLogin) {
+    return <Navigate to="/login" />;
+  }
+  return <Outlet />;
 };
+
+export default PrivateRoute;
